@@ -82,9 +82,12 @@ st.dataframe(filtered[['이름', '주소', '음식종류', '주차난이도', '�
 st.markdown("#### 지도에서 위치 확인")
 map_df = filtered.dropna(subset=['lat', 'lng'])
 if not map_df.empty:
-    st.map(map_df[['lat', 'lng']])
+    # 컬럼명 변환!
+    map_df = map_df.rename(columns={'lat': 'latitude', 'lng': 'longitude'})
+    st.map(map_df[['latitude', 'longitude']])
 else:
     st.info("지도에 표시할 식당이 없습니다(주소 변환 실패 또는 필터 조건).")
+
 
 # --- 상세 정보
 for idx, row in filtered.iterrows():
