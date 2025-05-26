@@ -13,7 +13,7 @@ df.columns = df.columns.str.strip()
 
 st.title("우리 학교 근처 회식장소 모음")
 
-# 1. 학교 위치 위도/경도 얻기 (최초 한 번만)
+# 1. 학교 위경도
 @st.cache_data
 def get_latlng(address):
     geolocator = Nominatim(user_agent="school_locator")
@@ -25,7 +25,7 @@ def get_latlng(address):
 
 school_lat, school_lng = get_latlng(school_address)
 
-# 2. 각 식당 주소 → 위도/경도 변환 (혹시 주소가 많으면 시간 좀 걸림)
+# 2. 식당 주소 위경도 변환 (최초만 느릴 수 있음, 이후 캐싱)
 def get_latlng_row(address):
     geolocator = Nominatim(user_agent="store_locator")
     location = geolocator.geocode(address)
@@ -34,7 +34,6 @@ def get_latlng_row(address):
     else:
         return pd.Series({'lat': None, 'lng': None})
 
-# 주소 → 위경도 변환 (캐싱)
 @st.cache_data
 def add_latlng_columns(df):
     temp_df = df.copy()
@@ -52,9 +51,9 @@ def calc_distance(row):
         return None
 
 df['학교와_거리_km'] = df.apply(calc_distance, axis=1)
-df['학교와_거리_km'] = df['학교와_거리_km'].apply(lambda x: round(x, 2) if pd.notnull(x) else "알 수 없음")
+df['학교와_거리_km'] = df['학교와_거리_km'].apply(lambda x: round(x, 2) if pd.notnull(x) else None)
 
-# 4. 페이지 내 필터 UI
+# --- 필터 UI (페이지 내 배치)
 col1, col2, col3 = st.columns(3)
 with col1:
     food_types = st.multiselect('음식종류', sorted(df['음식종류'].dropna().unique()))
@@ -71,10 +70,23 @@ if parking:
 if holiday:
     filtered = filtered[filtered['휴무'].isin(holiday)]
 
-st.subheader("회식장소 리스트 (학교와 거리 표시)")
+# 거리순 정렬 (선택 기능)
+sort_order = st.selectbox("정렬 방법", ["가까운 순", "먼 순"], index=0)
+filtered = filtered.dropna(subset=['학교와_거리_km'])
+filtered = filtered.sort_values(by='학교와_거리_km', ascending=(sort_order == "가까운 순"))
+
+st.subheader("회식장소 리스트 (학교와 거리 포함, 지도 시각화 지원)")
 st.dataframe(filtered[['이름', '주소', '음식종류', '주차난이도', '휴무', '오픈시간', '학교와_거리_km']], use_container_width=True)
 
-# 상세 정보
+# --- 지도 시각화
+st.markdown("#### 지도에서 위치 확인")
+map_df = filtered.dropna(subset=['lat', 'lng'])
+if not map_df.empty:
+    st.map(map_df[['lat', 'lng']])
+else:
+    st.info("지도에 표시할 식당이 없습니다(주소 변환 실패 또는 필터 조건).")
+
+# --- 상세 정보
 for idx, row in filtered.iterrows():
     st.markdown(f"---\n### {row['이름']}")
     st.write(f"**주소:** {row['주소']}")
