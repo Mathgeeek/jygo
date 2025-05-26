@@ -11,7 +11,7 @@ gsheet_url = "https://docs.google.com/spreadsheets/d/1YxB2y-Vvfyk3AKPR8zCYZgldDn
 df = pd.read_csv(gsheet_url)
 df.columns = df.columns.str.strip()
 
-st.title("우리 학교 근처 회식장소 모음")
+st.title("안녕하세요")
 
 # 1. 학교 위경도
 @st.cache_data
