@@ -13,12 +13,9 @@ st.set_page_config(
 st.title("🏫 주엽고 근처 회식 장소 추천 웹 앱")
 st.write("주엽고등학교 근처의 맛집 정보를 한눈에 확인하고, 지도에서 위치를 찾아보세요!")
 
-# CSV 파일 로드 (깃허브에 업로드한 파일 이름을 정확히 맞춰주세요)
-# 파일명에 공백이나 특수문자가 있다면 오류가 발생할 수 있으므로,
-# 만약 '주엽고 근처 맛집 List 👍👍 - 시트1.csv' 대신 'restaurants.csv' 등으로 이름을 바꾸시는 것을 추천합니다.
-# 저는 이 예제에서는 '주엽고 근처 맛집 List 👍👍 - 시트1.csv'로 가정하겠습니다.
+# CSV 파일 로드 (파일명: restaurants.csv)
 try:
-    df = pd.read_csv("restaurants.csv")
+    df = pd.read_csv("restaurants.csv") # <-- 파일 이름 변경 적용
 
     # 필수 컬럼 존재 여부 확인
     required_columns = ['이름', '주소', '위도', '경도']
@@ -38,7 +35,7 @@ try:
         st.stop()
 
 except FileNotFoundError:
-    st.error("CSV 파일을 찾을 수 없습니다. 파일 이름이 'restaurants.csv'가 맞는지 확인해주세요.")
+    st.error("CSV 파일을 찾을 수 없습니다. 파일 이름이 'restaurants.csv'가 맞는지 확인해주세요.") # <-- 파일 이름 변경 적용
     st.stop()
 except Exception as e:
     st.error(f"CSV 파일을 로드하는 중 오류가 발생했습니다: {e}")
@@ -48,50 +45,70 @@ except Exception as e:
 st.sidebar.header("필터링 옵션")
 
 # 음식 종류 필터
-food_types = ['전체'] + sorted(df['음식종류'].dropna().unique().tolist())
-selected_food_type = st.sidebar.selectbox("음식 종류", food_types)
+# '음식종류' 컬럼이 없는 경우를 대비하여 get() 메서드 사용 또는 오류 처리 추가
+if '음식종류' in df.columns:
+    food_types = ['전체'] + sorted(df['음식종류'].dropna().unique().tolist())
+    selected_food_type = st.sidebar.selectbox("음식 종류", food_types)
+else:
+    food_types = ['전체']
+    selected_food_type = '전체'
+    st.sidebar.warning("CSV 파일에 '음식종류' 컬럼이 없습니다.")
+
 
 # 주차 난이도 필터
-parking_difficulties = ['전체'] + sorted(df['주차난이도'].dropna().unique().tolist())
-selected_parking_difficulty = st.sidebar.selectbox("주차 난이도", parking_difficulties)
+if '주차난이도' in df.columns:
+    parking_difficulties = ['전체'] + sorted(df['주차난이도'].dropna().unique().tolist())
+    selected_parking_difficulty = st.sidebar.selectbox("주차 난이도", parking_difficulties)
+else:
+    parking_difficulties = ['전체']
+    selected_parking_difficulty = '전체'
+    st.sidebar.warning("CSV 파일에 '주차난이도' 컬럼이 없습니다.")
+
 
 # 데이터 필터링
 filtered_df = df.copy()
-if selected_food_type != '전체':
+if selected_food_type != '전체' and '음식종류' in filtered_df.columns:
     filtered_df = filtered_df[filtered_df['음식종류'] == selected_food_type]
-if selected_parking_difficulty != '전체':
+if selected_parking_difficulty != '전체' and '주차난이도' in filtered_df.columns:
     filtered_df = filtered_df[filtered_df['주차난이도'] == selected_parking_difficulty]
+
 
 st.subheader("📍 지도에서 식당 위치 확인")
 
 # 지도 중심 좌표 설정 (주엽고등학교 근처)
 # 주엽고등학교 (대략적인 위도, 경도)
-juyeop_school_lat = 37.669818
-juyeop_school_lon = 126.764516
+juyeop_school_lat = 445830
+juyeop_school_lon = 1160203
 
-# 필터링된 데이터가 없으면 기본 지도를 표시
+# 지도 생성
 if filtered_df.empty:
-    st.warning("선택하신 조건에 맞는 식당이 없습니다. 필터를 조정해주세요.")
-    # 필터링된 데이터가 없어도 지도는 보여줌 (중심은 주엽고)
     m = folium.Map(location=[juyeop_school_lat, juyeop_school_lon], zoom_start=15)
+    st.warning("선택하신 조건에 맞는 식당이 없습니다. 필터를 조정해주세요.")
 else:
-    # 필터링된 식당들의 평균 위치를 지도의 중심으로 설정
-    avg_lat = filtered_df['위도'].mean()
-    avg_lon = filtered_df['경도'].mean()
-    m = folium.Map(location=[avg_lat, avg_lon], zoom_start=15)
+    # 필터링된 식당들의 위도/경도 범위를 계산하여 지도 경계 설정
+    min_lat, max_lat = filtered_df['위도'].min(), filtered_df['위도'].max()
+    min_lon, max_lon = filtered_df['경도'].min(), filtered_df['경도'].max()
+
+    # 지도를 초기화할 때, 필터링된 식당들의 평균 위치를 중심으로 설정
+    m = folium.Map(location=[filtered_df['위도'].mean(), filtered_df['경도'].mean()], zoom_start=13)
+
+    # 모든 마커를 포함하는 경계에 지도를 맞춤 (자동 줌 조절)
+    # fit_bounds는 [[south_lat, west_lon], [north_lat, east_lon]] 형식의 리스트를 받습니다.
+    m.fit_bounds([[min_lat, min_lon], [max_lat, max_lon]])
+
 
     # 각 식당 위치에 마커 추가
     for idx, row in filtered_df.iterrows():
-        popup_html = f"""
-        <h4>{row['이름']}</h4>
-        <p><strong>주소:</strong> {row['주소']}</p>
-        <p><strong>연락처:</strong> {row.get('연락처', '정보 없음')}</p>
-        <p><strong>음식 종류:</strong> {row.get('음식종류', '정보 없음')}</p>
-        <p><strong>주차 난이도:</strong> {row.get('주차난이도', '정보 없음')}</p>
-        <p><strong>휴무:</strong> {row.get('휴무', '정보 없음')}</p>
-        <p><strong>오픈 시간:</strong> {row.get('오픈시간', '정보 없음')}</p>
-        <p><strong>비고:</strong> {row.get('비고', '정보 없음')}</p>
-        """
+        # 팝업 정보에 각 컬럼이 있는지 확인하고 있으면 추가
+        popup_html = f"<h4>{row['이름']}</h4>"
+        if '주소' in row: popup_html += f"<p><strong>주소:</strong> {row['주소']}</p>"
+        if '연락처' in row: popup_html += f"<p><strong>연락처:</strong> {row['연락처']}</p>"
+        if '음식종류' in row: popup_html += f"<p><strong>음식 종류:</strong> {row['음식종류']}</p>"
+        if '주차난이도' in row: popup_html += f"<p><strong>주차 난이도:</strong> {row['주차난이도']}</p>"
+        if '휴무' in row: popup_html += f"<p><strong>휴무:</strong> {row['휴무']}</p>"
+        if '오픈시간' in row: popup_html += f"<p><strong>오픈 시간:</strong> {row['오픈시간']}</p>"
+        if '비고' in row: popup_html += f"<p><strong>비고:</strong> {row['비고']}</p>"
+
         folium.Marker(
             location=[row['위도'], row['경도']],
             popup=folium.Popup(popup_html, max_width=300),
@@ -106,10 +123,11 @@ if filtered_df.empty:
     st.info("필터링 조건에 맞는 식당이 없습니다.")
 else:
     # 필요한 열만 선택하여 표시 (사용자 편의성 증대)
+    # CSV 파일에 없는 컬럼을 표시하려고 하면 오류가 발생하므로,
+    # 실제 df에 있는 열만 선택하도록 로직 강화
     display_columns = ['이름', '주소', '연락처', '음식종류', '주차난이도', '휴무', '오픈시간', '비고']
-    # 실제 df에 있는 열만 선택
-    display_columns = [col for col in display_columns if col in filtered_df.columns]
-    st.dataframe(filtered_df[display_columns], use_container_width=True)
+    final_display_columns = [col for col in display_columns if col in filtered_df.columns]
+    st.dataframe(filtered_df[final_display_columns], use_container_width=True)
 
 st.markdown("---")
 st.info("이 앱은 주엽고등학교 선생님들을 위한 회식 장소 추천 서비스입니다. 정보 오류가 있을 수 있습니다.")
