@@ -38,6 +38,8 @@ def haversine_distance(lat1, lon1, lat2, lon2):
 
 # CSV 파일 로드 (파일명: restaurants.csv)
 try:
+    # 사용자로부터 업로드된 파일 이름을 가정하여 'restaurants.csv'로 로드합니다.
+    # 만약 깃허브에 업로드한 파일 이름이 다르다면 이 부분을 수정해주세요.
     df = pd.read_csv("restaurants.csv")
 
     required_columns = ['이름', '주소', '위도', '경도']
@@ -146,7 +148,9 @@ with col1: # 지도를 왼쪽에 배치
 
         # 각 식당 위치에 마커 추가
         for idx, row in filtered_df.iterrows():
-            if pd.notnull(row['위도']) and pd.notnull(row['경ho']):
+            # 위도와 경도 값이 유효한 경우에만 마커 추가
+            # 여기가 문제의 원인이었습니다. '경ho' -> '경도'로 수정됨
+            if pd.notnull(row['위도']) and pd.notnull(row['경도']):
                 popup_html = f"<h4>{row['이름']}</h4>"
                 popup_html += f"<p><strong>주소:</strong> {row.get('주소', '정보 없음')}</p>"
                 popup_html += f"<p><strong>연락처:</strong> {row.get('연락처', '정보 없음')}</p>"
@@ -154,7 +158,9 @@ with col1: # 지도를 왼쪽에 배치
                 popup_html += f"<p><strong>주차 난이도:</strong> {row.get('주차난이도', '정보 없음')}</p>"
                 popup_html += f"<p><strong>휴무:</strong> {row.get('휴무', '정보 없음')}</p>"
                 popup_html += f"<p><strong>오픈 시간:</strong> {row.get('오픈시간', '정보 없음')}</p>"
-                popup_html += f"<p><strong>거리:</strong> {row['거리(km)']:.2f} km</p>" # 거리 정보 추가
+                # '거리(km)' 컬럼이 있는지 확인하고 추가 (오류 방지)
+                if '거리(km)' in row:
+                     popup_html += f"<p><strong>거리:</strong> {row['거리(km)']:.2f} km</p>"
                 popup_html += f"<p><strong>비고:</strong> {row.get('비고', '정보 없음')}</p>"
 
                 folium.Marker(
@@ -173,7 +179,12 @@ else:
     # '거리(km)' 컬럼을 표시 목록에 추가
     display_columns = ['이름', '거리(km)', '주소', '연락처', '음식종류', '주차난이도', '휴무', '오픈시간', '비고']
     final_display_columns = [col for col in display_columns if col in filtered_df.columns]
-    st.dataframe(filtered_df[final_display_columns].round({'거리(km)': 2}), use_container_width=True) # 거리 소수점 2자리
+    # '거리(km)' 컬럼이 있을 때만 반올림 적용
+    if '거리(km)' in filtered_df.columns:
+        st.dataframe(filtered_df[final_display_columns].round({'거리(km)': 2}), use_container_width=True)
+    else:
+        st.dataframe(filtered_df[final_display_columns], use_container_width=True)
+
 
 st.markdown("---")
 st.info("이 앱은 주엽고등학교 선생님들을 위한 회식 장소 추천 서비스입니다. 정보 오류가 있을 수 있습니다.")
