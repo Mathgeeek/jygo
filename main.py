@@ -77,8 +77,8 @@ st.subheader("📍 지도에서 식당 위치 확인")
 
 # 지도 중심 좌표 설정 (주엽고등학교 근처)
 # 주엽고등학교 (대략적인 위도, 경도)
-juyeop_school_lat = 445830
-juyeop_school_lon = 1160203
+juyeop_school_lat = 37.675838
+juyeop_school_lon = 126.754790
 
 # 지도 생성
 if filtered_df.empty:
