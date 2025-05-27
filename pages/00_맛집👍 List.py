@@ -15,8 +15,8 @@ st.title("🏫 주엽고 근처 회식 장소 추천 웹 앱")
 st.write("주엽고등학교 근처의 맛집 정보를 한눈에 확인하고, 지도에서 위치를 찾아보세요!")
 
 # 주엽고등학교 위도, 경도 (하드코딩 - 필요시 CSV나 설정 파일에서 불러오도록 변경 가능)
-JUYEOP_SCHOOL_LAT = 37.6700
-JUYEOP_SCHOOL_LON = 126.7645
+JUYEOP_SCHOOL_LAT = 37.675760
+JUYEOP_SCHOOL_LON = 126.754785
 
 # --- 거리 계산 함수 (하버사인 공식) ---
 def haversine_distance(lat1, lon1, lat2, lon2):
