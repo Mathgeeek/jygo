@@ -74,6 +74,13 @@ else: # 데이터가 있을 경우에만 지도를 그립니다.
     col1, col2 = st.columns([2, 1]) # 지도(2)와 필터/정렬(1)의 비율
 
     with col2: # 필터링 및 정렬 옵션을 오른쪽에 배치
+        # --- 사이드바 상단에 추가할 내용 ---
+        st.markdown("## 데이터 정보")
+        st.write("이 앱의 데이터는 매 24시간마다 자동으로 업데이트됩니다.")
+        st.write(f"[구글 시트 바로 가기]({https://docs.google.com/spreadsheets/d/1YxB2y-Vvfyk3AKPR8zCYZgldDnAdk_aeaLqbl25Ye34/edit?gid=0#gid=0})")  # 버튼 대신 링크 형태
+
+        st.markdown("---")  # 구분선
+        # --- 기존 필터링 및 정렬 코드 ---
         st.header("필터링 및 정렬")
 
         # 음식 종류 필터
