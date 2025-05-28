@@ -4,6 +4,15 @@ import folium
 from streamlit_folium import folium_static
 import math
 
+# 페이지 설정
+st.set_page_config(
+    page_title="주엽고 근처 맛집",
+    page_icon="🍗",
+    layout="wide"
+)
+
+# 메인 페이지 문구 시작
+st.title("👨‍🏫 주엽고 근처 식당 정보😎")
 
 # 주엽고등학교 위도, 경도
 JUYEOP_SCHOOL_LAT = 37.675760
