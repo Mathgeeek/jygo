@@ -77,11 +77,62 @@ else: # 데이터가 있을 경우에만 지도를 그립니다.
     col1, col2 = st.columns([2, 1]) # 지도(2)와 필터/정렬(1)의 비율
 
     with col2: # 필터링 및 정렬 옵션을 오른쪽에 배치
-        # --- 사이드바 상단에 추가할 내용 ---
-        st.markdown("## 데이터 정보")
-        st.write("이 앱의 데이터는 매 24시간마다 자동으로 업데이트됩니다.")
-        # 구글 시트 원본 (편집) 링크를 직접 문자열로 삽입
-        st.write(f"[구글 시트 원본 바로 가기]({GOOGLE_SHEET_EDIT_URL})")  # 수정된 부분
+               # Custom CSS for the button-like link
+        st.markdown("""
+        <style>
+        .stButton>button {
+            width: 100%;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            background-color: #4CAF50; /* Green */
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none; /* Remove underline */
+            display: inline-block;
+            transition: background-color 0.3s ease;
+        }
+        .stButton>button:hover {
+            background-color: #45a049;
+        }
+        .stButton>button:active {
+            background-color: #3e8e41;
+        }
+        .info-box {
+            background-color: #f0f2f6; /* Streamlit light background */
+            border-left: 5px solid #4CAF50; /* Green border */
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .info-box p {
+            margin-bottom: 5px; /* Adjust spacing between lines */
+            font-size: 0.95rem;
+        }
+        .stMarkdown a {
+            text-decoration: none; /* Remove underline for general links */
+            color: inherit; /* Inherit color from parent */
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+        with st.container(border=True): # 깔끔한 박스 형태를 위해 st.container(border=True) 사용
+            st.markdown("""
+            <div class="info-box">
+                <p>💡 <strong>데이터 업데이트 주기:</strong></p>
+                <p>이 앱의 데이터는 매 24시간마다 자동으로 반영됩니다.</p>
+                <br> <p>데이터 수정이 필요하시면 아래 링크를 통해 원본 시트에 접속해주세요.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # 버튼처럼 보이는 링크
+            link_text = "구글 시트 원본 바로 가기 ➡️"
+            st.link_button(link_text, GOOGLE_SHEET_EDIT_URL, help="새 탭에서 구글 시트 원본을 엽니다.")
+
 
         st.markdown("---")  # 구분선
         # --- 기존 필터링 및 정렬 코드 ---
