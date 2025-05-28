@@ -4,9 +4,6 @@ import folium
 from streamlit_folium import folium_static
 import math
 
-# --- 페이지 설정은 app.py에서 이미 하므로 여기서는 불필요하거나 간소화 ---
-# 이 페이지의 제목만 설정 (사이드바에 나타나는 이름)
-st.set_page_page_title("회식 장소 추천")
 
 # 주엽고등학교 위도, 경도
 JUYEOP_SCHOOL_LAT = 37.675760
