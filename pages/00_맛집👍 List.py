@@ -165,7 +165,7 @@ else: # 데이터가 있을 경우에만 지도를 그립니다.
                     popup_html += f"<p><strong>오픈 시간:</strong> {row.get('오픈시간', '정보 없음')}</p>"
                     # '거리(km)' 컬럼이 있는지 확인하고 추가 (오류 방지)
                     if '거리(km)' in row:
-                         popup_html += f"<p><strong>거리:</strong> {row['거리(km)']:.2f} km</p>"
+                    popup_html += f"<p><strong>거리:</strong> {row['거리(km)']:.2f} km</p>"
                     popup_html += f"<p><strong>비고:</strong> {row.get('비고', '정보 없음')}</p>"
 
                     folium.Marker(
