@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import folium
 from streamlit_folium import folium_static
-import math # 거리 계산을 위해 math 모듈 추가
+import math
 
 # 페이지 설정
 st.set_page_config(
@@ -14,7 +14,7 @@ st.set_page_config(
 st.title("🏫 주엽고 근처 회식 장소 추천 웹 앱")
 st.write("주엽고등학교 근처의 맛집 정보를 한눈에 확인하고, 지도에서 위치를 찾아보세요!")
 
-# 주엽고등학교 위도, 경도 (하드코딩 - 필요시 CSV나 설정 파일에서 불러오도록 변경 가능)
+# 주엽고등학교 위도, 경도
 JUYEOP_SCHOOL_LAT = 37.675760
 JUYEOP_SCHOOL_LON = 126.754785
 
@@ -38,8 +38,7 @@ def haversine_distance(lat1, lon1, lat2, lon2):
 
 # CSV 파일 로드 (파일명: restaurants.csv)
 try:
-    # 사용자로부터 업로드된 파일 이름을 가정하여 'restaurants.csv'로 로드합니다.
-    # 만약 깃허브에 업로드한 파일 이름이 다르다면 이 부분을 수정해주세요.
+    # 사용자로부터 업로드된 파일 이름을 'restaurants.csv'로 로드합니다.
     df = pd.read_csv("restaurants.csv")
 
     required_columns = ['이름', '주소', '위도', '경도']
@@ -187,5 +186,5 @@ else:
 
 
 st.markdown("---")
-st.info("이 앱은 주엽고등학교 선생님들을 위한 회식 장소 추천 서비스입니다. 정보 오류가 있을 수 있습니다.")
-st.markdown("Made with ❤️ by 선생님")
+st.info("이 앱은 주엽고등학교 선생님들을 위한 회식 장소 추천 서비스입니다. 정보에 오류가 있다면 제게 말씀해주세요!")
+st.markdown("Made by 주엽고 수학쟁이🤗")
