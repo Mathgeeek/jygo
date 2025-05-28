@@ -125,13 +125,14 @@ else: # 데이터가 있을 경우에만 지도를 그립니다.
             <div class="info-box">
                 <p>💡 <strong>데이터 업데이트 주기:</strong></p>
                 <p>이 앱의 데이터는 매 24시간마다 자동으로 반영됩니다.</p>
+                <p>혹시 어제 맛집에 다녀오셨나요? 공유해 주세요!</p>
                 <p>식당 정보 수정 및 추가는 아래 링크를 통해 할 수 있습니다.</p>
                 <p>맛집 많이 많이 추가해주세요🍗🍗</p>
             </div>
             """, unsafe_allow_html=True)
             
             # 버튼처럼 보이는 링크
-            link_text = "구글 시트 원본 바로 가기 ➡️"
+            link_text = "식당 정보 수정 및 추가하기 ➡️"
             st.link_button(link_text, GOOGLE_SHEET_EDIT_URL, help="새 탭에서 구글 시트 원본을 엽니다.")
 
 
