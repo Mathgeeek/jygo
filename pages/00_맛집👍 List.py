@@ -11,6 +11,22 @@ st.set_page_config(
     layout="wide"
 )
 
+# 폰트 설정
+st.markdown(
+    """
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Gowun+Batang&family=Noto+Serif+KR:wght@200..900&family=Orbit&family=Poor+Story&display=swap');
+    html, body, [class*="css"]  {
+        font-family: 'Orbit', sans-serif !important;
+    }
+    * {
+        font-family: 'Orbit', sans-serif !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # 메인 페이지 문구 시작
 st.title("😋넌 먹을 때가 제일 예뻐🍔")
 
