@@ -4,19 +4,9 @@ import folium
 from streamlit_folium import folium_static
 import math
 
-# 페이지 설정
-st.set_page_config(
-    page_title="주엽고 근처 맛집",
-    page_icon="🍗",
-    layout="wide"
-)
-
-# 메인 페이지 문구 시작
-st.title("👨‍🏫 주엽고 근처 식당 정보😎")
-
 # 주엽고등학교 위도, 경도
-JUYEOP_SCHOOL_LAT = 37.675760
-JUYEOP_SCHOOL_LON = 126.754785
+JUYEOP_SCHOOL_LAT = 37.675760 # 선생님이 제공해주신 주엽고 좌표
+JUYEOP_SCHOOL_LON = 126.754785 # 선생님이 제공해주신 주엽고 좌표
 
 # --- 거리 계산 함수 (하버사인 공식) ---
 def haversine_distance(lat1, lon1, lat2, lon2):
@@ -33,7 +23,10 @@ def haversine_distance(lat1, lon1, lat2, lon2):
     return distance # 킬로미터 단위
 
 # --- CSV 파일 로드 (웹 게시된 구글 시트 URL 붙여넣기) ---
+# 이 URL은 웹에 게시된 CSV 내보내기 URL이어야 합니다.
 GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR6q6NZYeuslBgpRhgLnjpKOibv56VFnpsBvQDbHvfxE9KnQSUkrVIAF6bCOkrd92EO1JdGrm--H5KW/pub?output=csv"
+# 구글 시트의 원본 (편집) 링크. 이건 데이터를 읽어오는 용도가 아님.
+GOOGLE_SHEET_EDIT_URL = "https://docs.google.com/spreadsheets/d/1YxB2y-Vvfyk3AKPR8zCYZgldDnAdk_aeaLqbl25Ye34/edit?gid=0#gid=0"
 
 @st.cache_data(ttl=86400) # 24시간마다 데이터 갱신
 def load_data(url):
@@ -77,7 +70,8 @@ else: # 데이터가 있을 경우에만 지도를 그립니다.
         # --- 사이드바 상단에 추가할 내용 ---
         st.markdown("## 데이터 정보")
         st.write("이 앱의 데이터는 매 24시간마다 자동으로 업데이트됩니다.")
-        st.write(f"[구글 시트 바로 가기]({'https://docs.google.com/spreadsheets/d/1YxB2y-Vvfyk3AKPR8zCYZgldDnAdk_aeaLqbl25Ye34/edit?gid=0#gid=0'})")  # 버튼 대신 링크 형태
+        # 구글 시트 원본 (편집) 링크를 직접 문자열로 삽입
+        st.write(f"[구글 시트 원본 바로 가기]({GOOGLE_SHEET_EDIT_URL})")  # 수정된 부분
 
         st.markdown("---")  # 구분선
         # --- 기존 필터링 및 정렬 코드 ---
@@ -165,7 +159,7 @@ else: # 데이터가 있을 경우에만 지도를 그립니다.
                     popup_html += f"<p><strong>오픈 시간:</strong> {row.get('오픈시간', '정보 없음')}</p>"
                     # '거리(km)' 컬럼이 있는지 확인하고 추가 (오류 방지)
                     if '거리(km)' in row:
-                    popup_html += f"<p><strong>거리:</strong> {row['거리(km)']:.2f} km</p>"
+                        popup_html += f"<p><strong>거리:</strong> {row['거리(km)']:.2f} km</p>" # .2f 포맷팅으로 이미 문자열처럼 처리
                     popup_html += f"<p><strong>비고:</strong> {row.get('비고', '정보 없음')}</p>"
 
                     folium.Marker(
