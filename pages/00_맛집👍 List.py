@@ -4,6 +4,29 @@ import folium
 from streamlit_folium import folium_static
 import math
 
+# 페이지 설정
+st.set_page_config(
+    page_title="주엽고❤️❤️",
+    page_icon="🏫",
+    layout="wide"
+)
+
+# 폰트 설정
+st.markdown(
+    """
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Gowun+Batang&family=Noto+Serif+KR:wght@200..900&family=Orbit&family=Poor+Story&display=swap');
+    html, body, [class*="css"]  {
+        font-family: 'Orbit', sans-serif !important;
+    }
+    * {
+        font-family: 'Orbit', sans-serif !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # 주엽고등학교 위도, 경도
 JUYEOP_SCHOOL_LAT = 37.675760 # 선생님이 제공해주신 주엽고 좌표
 JUYEOP_SCHOOL_LON = 126.754785 # 선생님이 제공해주신 주엽고 좌표
