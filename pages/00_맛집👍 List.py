@@ -4,12 +4,12 @@ import folium
 from streamlit_folium import folium_static
 import math
 
-# 페이지 설정 (app.py에서 이미 설정했으므로 여기서는 불필요하지만, 편의상 유지)
-# st.set_page_config(
-#     page_title="주엽고❤️❤️",
-#     page_icon="🏫",
-#     layout="wide"
-# )
+
+ st.set_page_config(
+     page_title="주엽고❤️❤️",
+     page_icon="🏫",
+     layout="wide"
+ )
 
 # 주엽고등학교 위도, 경도
 JUYEOP_SCHOOL_LAT = 37.675760
