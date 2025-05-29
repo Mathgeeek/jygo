@@ -111,11 +111,13 @@ else: # 데이터가 있을 경우에만 지도를 그립니다.
             display: inline-block;
             transition: background-color 0.3s ease;
         }
-        .stButton>button:hover {
-            background-color: #45a049;
+         .stButton>button:hover {
+            background-color: #3e8e41;
+            color: white;
+            border: 1px solid #2d6b30;
         }
         .stButton>button:active {
-            background-color: #3e8e41;
+            background-color: #2d6b30;
         }
         .info-box {
             background-color: #f0f2f6; /* Streamlit light background */
