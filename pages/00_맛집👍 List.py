@@ -60,7 +60,7 @@ else:
     # --- CSS 및 메인 페이지 콘텐츠 ---
     st.markdown("""
     <style>
-    /* 폰트 설정 (이전 app.py에서 설정한 것과 동일하게 유지) */
+    /* 폰트 설정 (app.py의 폰트 설정과 동일하게 유지) */
     @import url('https://fonts.googleapis.com/css2?family=Gowun+Batang&family=Noto+Serif+KR:wght@200..900&family=Orbit&family=Poor+Story&display=swap');
     html, body, [class*="css"] {
         font-family: 'Orbit', sans-serif !important;
@@ -70,31 +70,34 @@ else:
     }
 
     /* 버튼 스타일 */
+    /* Streamlit의 기본 버튼 클래스를 더 구체적으로 타겟팅 */
     .stButton>button {
         width: 100%;
         border-radius: 0.5rem;
         padding: 0.75rem 1rem;
-        background-color: #4CAF50; /* Green */
-        color: white;
+        background-color: #4CAF50 !important; /* 초록색으로 강제 적용 */
+        color: white !important; /* 흰색으로 강제 적용 */
         font-size: 1rem;
         font-weight: bold;
-        border: none;
+        border: none !important; /* 테두리 없앰 강제 적용 */
         cursor: pointer;
         text-align: center;
         text-decoration: none;
         display: inline-block;
         transition: background-color 0.3s ease, color 0.3s ease, border 0.3s ease, text-shadow 0.3s ease;
     }
-    /* 호버 시 스타일 강제 적용 */
+    
+    /* 호버 시 스타일 */
     .stButton>button:hover {
-        background-color: #000000 !important; /* 검정색으로 강제 적용 */
-        color: #FFFFFF !important; /* 흰색으로 강제 적용 */
-        border: 1px solid #000000 !important; /* 테두리도 검정색으로 강제 적용 */
-        text-shadow: 0px 0px 5px rgba(255,255,255,0.8) !important; /* 글자 그림자도 강하게 */
+        background-color: #0A0A0A !important; /* 거의 검정에 가까운 매우 어두운 색상으로 강제 적용 */
+        color: #FFFFFF !important; /* 글자색을 명확한 흰색으로 강제 적용 */
+        border: 1px solid #222222 !important; /* 테두리도 어둡게 강제 적용 */
+        text-shadow: 0px 0px 5px rgba(255,255,255,0.8) !important; /* 글자에 흰색 그림자 추가 */
     }
+    
     /* 클릭 시 스타일 (active 상태) */
     .stButton>button:active {
-        background-color: #333333 !important; /* 클릭 시 약간 밝은 검정 */
+        background-color: #333333 !important; /* 클릭 시 약간 밝은 검정으로 강제 적용 */
         color: #FFFFFF !important;
         border: 1px solid #333333 !important;
     }
