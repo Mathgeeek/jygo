@@ -149,11 +149,11 @@ else:
             """, unsafe_allow_html=True)
             
             st.link_button("구글 시트 원본 바로 가기 ➡️", GOOGLE_SHEET_EDIT_URL, help="새 탭에서 구글 시트 원본을 엽니다.")
-
-
         st.markdown("---")
+
         
-        st.header("나에게 맞는 식당 찾기 ✨")
+        with st.container(border=True):
+            st.header("나에게 맞는 식당 찾기 ✨") # 제목을 박스 안에 넣음
 
         if 'filter_option' not in st.session_state:
             st.session_state.filter_option = 'None'
