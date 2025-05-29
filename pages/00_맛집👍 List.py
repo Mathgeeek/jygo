@@ -5,8 +5,8 @@ from streamlit_folium import folium_static
 import math
 
 # 주엽고등학교 위도, 경도
-JUYEOP_SCHOOL_LAT = 37.675760
-JUYEOP_SCHOOL_LON = 126.754785
+JUYEOP_SCHOOL_LAT = 37.675760 # 선생님이 제공해주신 주엽고 좌표
+JUYEOP_SCHOOL_LON = 126.754785 # 선생님이 제공해주신 주엽고 좌표
 
 # --- 거리 계산 함수 (하버사인 공식) ---
 def haversine_distance(lat1, lon1, lat2, lon2):
@@ -69,38 +69,24 @@ else:
         font-family: 'Orbit', sans-serif !important;
     }
 
-    /* 버튼 스타일 */
-    /* Streamlit의 기본 버튼 클래스를 더 구체적으로 타겟팅 */
+    /* 버튼 스타일 - 최소한의 설정만 남기고 Streamlit 테마를 따르게 함 */
     .stButton>button {
         width: 100%;
         border-radius: 0.5rem;
         padding: 0.75rem 1rem;
-        background-color: #4CAF50 !important; /* 초록색으로 강제 적용 */
-        color: white !important; /* 흰색으로 강제 적용 */
+        /* background-color, color, border 등은 Streamlit 테마가 관리 */
         font-size: 1rem;
         font-weight: bold;
-        border: none !important; /* 테두리 없앰 강제 적용 */
         cursor: pointer;
         text-align: center;
         text-decoration: none;
         display: inline-block;
-        transition: background-color 0.3s ease, color 0.3s ease, border 0.3s ease, text-shadow 0.3s ease;
+        transition: none; /* 트랜지션 효과도 제거하여 Streamlit 기본 동작 따름 */
     }
-    
-    /* 호버 시 스타일 */
-    .stButton>button:hover {
-        background-color: #0A0A0A !important; /* 거의 검정에 가까운 매우 어두운 색상으로 강제 적용 */
-        color: #FFFFFF !important; /* 글자색을 명확한 흰색으로 강제 적용 */
-        border: 1px solid #222222 !important; /* 테두리도 어둡게 강제 적용 */
-        text-shadow: 0px 0px 5px rgba(255,255,255,0.8) !important; /* 글자에 흰색 그림자 추가 */
-    }
-    
-    /* 클릭 시 스타일 (active 상태) */
-    .stButton>button:active {
-        background-color: #333333 !important; /* 클릭 시 약간 밝은 검정으로 강제 적용 */
-        color: #FFFFFF !important;
-        border: 1px solid #333333 !important;
-    }
+    /* 호버, 클릭 시 스타일도 Streamlit 테마에 맡김. 불필요한 부분 제거 */
+    /* .stButton>button:hover { ... } */
+    /* .stButton>button:active { ... } */
+
 
     /* 정보 박스 스타일 */
     .info-box {
