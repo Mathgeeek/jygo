@@ -4,13 +4,6 @@ import folium
 from streamlit_folium import folium_static
 import math
 
-# 페이지 설정 (app.py에서 이미 설정했으므로 여기서는 불필요하지만, 편의상 유지)
-# st.set_page_config(
-#     page_title="주엽고❤️❤️",
-#     page_icon="🏫",
-#     layout="wide"
-# )
-
 # 주엽고등학교 위도, 경도
 JUYEOP_SCHOOL_LAT = 37.675760
 JUYEOP_SCHOOL_LON = 126.754785
@@ -90,18 +83,20 @@ else:
         text-align: center;
         text-decoration: none;
         display: inline-block;
-        transition: background-color 0.3s ease, color 0.3s ease, border 0.3s ease, text-shadow 0.3s ease; /* transition에 text-shadow 추가 */
+        transition: background-color 0.3s ease, color 0.3s ease, border 0.3s ease, text-shadow 0.3s ease;
     }
+    /* 호버 시 스타일 강제 적용 */
     .stButton>button:hover {
-        background-color: #1A1A1A; /* 거의 검정에 가까운 아주 진한 색상 */
-        color: #FFFFFF; /* 글자색을 명확한 흰색으로 고정 */
-        border: 1px solid #000000; /* 테두리도 검정색으로 */
-        text-shadow: 0px 0px 5px rgba(255,255,255,0.7); /* 글자에 흰색 그림자 추가 (가시성 극대화) */
+        background-color: #000000 !important; /* 검정색으로 강제 적용 */
+        color: #FFFFFF !important; /* 흰색으로 강제 적용 */
+        border: 1px solid #000000 !important; /* 테두리도 검정색으로 강제 적용 */
+        text-shadow: 0px 0px 5px rgba(255,255,255,0.8) !important; /* 글자 그림자도 강하게 */
     }
+    /* 클릭 시 스타일 (active 상태) */
     .stButton>button:active {
-        background-color: #000000; /* 클릭 시 완전 검정 */
-        color: #FFFFFF;
-        border: 1px solid #000000;
+        background-color: #333333 !important; /* 클릭 시 약간 밝은 검정 */
+        color: #FFFFFF !important;
+        border: 1px solid #333333 !important;
     }
 
     /* 정보 박스 스타일 */
@@ -140,6 +135,7 @@ else:
             """, unsafe_allow_html=True)
             
             st.link_button("구글 시트 원본 바로 가기 ➡️", GOOGLE_SHEET_EDIT_URL, help="새 탭에서 구글 시트 원본을 엽니다.")
+
 
         st.markdown("---")
         
