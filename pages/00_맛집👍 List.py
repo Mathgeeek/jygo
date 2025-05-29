@@ -155,23 +155,23 @@ else:
         with st.container(border=True):
             st.header("나에게 맞는 식당 찾기 ✨") # 제목을 박스 안에 넣음
 
-        if 'filter_option' not in st.session_state:
-            st.session_state.filter_option = 'None'
+            if 'filter_option' not in st.session_state:
+                st.session_state.filter_option = 'None'
 
-        btn_col1, btn_col2 = st.columns(2)
+            btn_col1, btn_col2 = st.columns(2)
 
-        with btn_col1:
-            if st.button("주차 걱정 No! 🅿️", help="주차 난이도 '하'인 식당을 우선적으로 보여줍니다."):
-                st.session_state.filter_option = 'parking_easy'
+            with btn_col1:
+                if st.button("주차 걱정 No! 🅿️", help="주차 난이도 '하'인 식당을 우선적으로 보여줍니다."):
+                    st.session_state.filter_option = 'parking_easy'
         
-        with btn_col2:
-            if st.button("학교와의 거리순 🚶‍♀️", help="학교에서 가까운 순서대로 정렬합니다."):
-                st.session_state.filter_option = 'distance_sort'
+            with btn_col2:
+                if st.button("학교와의 거리순 🚶‍♀️", help="학교에서 가까운 순서대로 정렬합니다."):
+                    st.session_state.filter_option = 'distance_sort'
 
-        if st.button("모든 필터/정렬 해제 🔄", help="모든 필터 및 정렬을 해제하고 초기 상태로 돌아갑니다."):
-            st.session_state.filter_option = 'None'
+            if st.button("모든 필터/정렬 해제 🔄", help="모든 필터 및 정렬을 해제하고 초기 상태로 돌아갑니다."):
+                st.session_state.filter_option = 'None'
 
-        filtered_df = df.copy()
+            filtered_df = df.copy()
 
         if st.session_state.filter_option == 'parking_easy':
             if '주차난이도' in filtered_df.columns:
