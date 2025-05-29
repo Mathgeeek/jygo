@@ -113,7 +113,7 @@ else: # 데이터가 있을 경우에만 지도를 그립니다.
         }
         .stButton>button:hover {
             background-color: #004085;
-            color: black;
+            color: white;
             border: 1px solid #002752;
         }
         .stButton>button:active {
