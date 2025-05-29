@@ -153,51 +153,46 @@ else: # 데이터가 있을 경우에만 지도를 그립니다.
 
 
         st.markdown("---")  # 구분선
-        # --- 기존 필터링 및 정렬 코드 ---
-        st.header("필터링 및 정렬")
+        # --- 새로운 필터링/정렬 버튼 추가 (수정될 부분) ---
+        st.header("나에게 맞는 식당 찾기 ✨")
 
-        # 음식 종류 필터
-        if '음식종류' in df.columns:
-            food_types = ['전체'] + sorted(df['음식종류'].dropna().unique().tolist())
-            selected_food_type = st.selectbox("음식 종류", food_types)
-        else:
-            food_types = ['전체']
-            selected_food_type = '전체'
-            st.warning("CSV 파일에 '음식종류' 컬럼이 없습니다.")
+        # 세션 상태 초기화 (초기값: 'None' = 아무 필터도 적용 안 됨)
+        if 'filter_option' not in st.session_state:
+            st.session_state.filter_option = 'None'
 
-        # 주차 난이도 필터
-        if '주차난이도' in df.columns:
-            parking_difficulties = ['전체'] + sorted(df['주차난이도'].dropna().unique().tolist())
-            selected_parking_difficulty = st.selectbox("주차 난이도", parking_difficulties)
-        else:
-            parking_difficulties = ['전체']
-            selected_parking_difficulty = '전체'
-            st.warning("CSV 파일에 '주차난이도' 컬럼이 없습니다.")
+        # 버튼을 나란히 배치하기 위해 컬럼 사용
+        btn_col1, btn_col2 = st.columns(2)
+
+        with btn_col1:
+            if st.button("주차 걱정 No! 🅿️", help="주차 난이도 '하'인 식당을 우선적으로 보여줍니다."):
+                st.session_state.filter_option = 'parking_easy'
         
-        st.markdown("---") # 구분선
-        
-        # 정렬 옵션
-        sort_options = {
-            "이름순 (오름차순)": ("이름", False),
-            "이름순 (내림차순)": ("이름", True),
-            "거리순 (가까운 순)": ("거리(km)", False),
-            "거리순 (먼 순)": ("거리(km)", True)
-        }
-        selected_sort_option = st.selectbox("정렬 기준", list(sort_options.keys()))
+        with btn_col2:
+            if st.button("학교와의 거리순 🚶‍♀️", help="학교에서 가까운 순서대로 정렬합니다."):
+                st.session_state.filter_option = 'distance_sort'
 
-    # 데이터 필터링
-    filtered_df = df.copy()
-    if selected_food_type != '전체' and '음식종류' in filtered_df.columns:
-        filtered_df = filtered_df[filtered_df['음식종류'] == selected_food_type]
-    if selected_parking_difficulty != '전체' and '주차난이도' in filtered_df.columns:
-        filtered_df = filtered_df[filtered_df['주차난이도'] == selected_parking_difficulty]
+        # 초기화 버튼 (모든 필터를 해제하고 초기 상태로 돌아감)
+        if st.button("모든 필터/정렬 해제 🔄", help="모든 필터 및 정렬을 해제하고 초기 상태로 돌아갑니다."):
+            st.session_state.filter_option = 'None'
 
-    # 데이터 정렬
-    sort_column, ascending = sort_options[selected_sort_option]
-    if sort_column in filtered_df.columns: # 정렬 기준 컬럼이 있는지 확인
-        filtered_df = filtered_df.sort_values(by=sort_column, ascending=ascending)
-    else:
-        st.warning(f"정렬 기준 '{sort_column}' 컬럼을 찾을 수 없어 정렬되지 않았습니다.")
+        # 데이터 필터링 및 정렬 로직
+        filtered_df = df.copy() # 원본 DataFrame을 복사하여 사용
+
+        if st.session_state.filter_option == 'parking_easy':
+            if '주차난이도' in filtered_df.columns:
+                # '하'인 식당을 먼저 보여주고, 나머지는 기존 순서 유지
+                parking_order = {'하': 0, '중': 1, '상': 2} # 주차 난이도에 순서 부여
+                # '하'인 식당을 필터링하고, 남은 식당들은 난이도 순으로 정렬
+                filtered_df['parking_sort_key'] = filtered_df['주차난이도'].map(parking_order)
+                filtered_df = filtered_df.sort_values(by='parking_sort_key', ascending=True).drop(columns='parking_sort_key')
+            else:
+                st.warning("CSV 파일에 '주차난이도' 컬럼이 없어 주차 필터를 적용할 수 없습니다.")
+        elif st.session_state.filter_option == 'distance_sort':
+            if '거리(km)' in filtered_df.columns:
+                filtered_df = filtered_df.sort_values(by='거리(km)', ascending=True)
+            else:
+                st.warning("CSV 파일에 '거리(km)' 컬럼이 없어 거리순 정렬을 적용할 수 없습니다.")
+        # 'None'이거나 다른 필터가 없는 경우, 기본 정렬 없음 (원본 순서 유지)
 
 
     with col1: # 지도를 왼쪽에 배치
