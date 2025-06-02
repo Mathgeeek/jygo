@@ -52,7 +52,6 @@ def load_data(url):
         st.stop()
         return pd.DataFrame()
 
-# Streamlit 앱 시작 시 데이터 로드 (캐시 사용)
 df = load_data(GOOGLE_SHEET_CSV_URL)
 
 if df.empty:
@@ -70,7 +69,7 @@ else:
         font-family: 'Orbit', sans-serif !important;
     }
 
-    /* 버튼 스타일 */
+    /* 버튼 스타일 - 최소한의 설정만 남기고 Streamlit 테마를 따르게 함 */
     .stButton>button {
         width: 100%;
         border-radius: 0.5rem;
@@ -146,7 +145,6 @@ else:
 
     # ---------------------------------------------------------------
     # 필터링 및 정렬 로직은 이제 `col1` (지도)와 `col2` (필터) 외부에서 독립적으로 처리
-    # 이렇게 해야 버튼 클릭 시 로직만 실행되고 지도 재로드를 최소화할 수 있습니다.
     # ---------------------------------------------------------------
     filtered_df = df.copy() # 원본 DataFrame을 복사하여 사용
 
@@ -165,53 +163,36 @@ else:
         else:
             st.warning("CSV 파일에 '거리(km)' 컬럼이 없어 거리순 정렬을 적용할 수 없습니다.")
 
-    # ---------------------------------------------------------------
-    # 지도 그리는 부분을 캐싱 함수로 분리
-    # 이렇게 하면 버튼 클릭 시 지도 자체는 다시 그려지지 않고,
-    # 지도를 구성하는 마커만 변경됩니다.
-    # ---------------------------------------------------------------
-
-    @st.cache_resource # 이 데코레이터는 지도를 한번만 생성하여 캐싱합니다.
-    def create_base_map(center_lat, center_lon, zoom):
-        m = folium.Map(location=[center_lat, center_lon], zoom_start=zoom)
-        # 주엽고등학교 마커는 기본 지도에 포함 (이동하지 않으므로)
-        folium.Marker(
-            location=[JUYEOP_SCHOOL_LAT, JUYEOP_SCHOOL_LON],
-            popup=folium.Popup("<strong>주엽고등학교</strong>", max_width=150),
-            tooltip="주엽고등학교",
-            icon=folium.Icon(color='red', icon='info-sign')
-        ).add_to(m)
-        return m
-
     with col1: # 지도를 왼쪽에 배치
         st.subheader("📍 지도에서 식당 위치 확인")
 
-        # 기본 지도 생성 (캐싱됨)
+        # 지도 생성 (이전 @st.cache_resource 함수 제거)
         # filtered_df가 비어있지 않다면 필터링된 식당들의 평균 위치를 사용, 아니면 학교 중심
         map_center_lat = filtered_df['위도'].mean() if not filtered_df.empty else JUYEOP_SCHOOL_LAT
         map_center_lon = filtered_df['경도'].mean() if not filtered_df.empty else JUYEOP_SCHOOL_LON
         
-        # 지도를 캐싱된 인스턴스에서 복사하여 마커만 추가/수정
-        # 매번 완전히 새로운 지도를 그리지 않고, 캐시된 기본 지도 객체를 수정합니다.
-        base_map = create_base_map(map_center_lat, map_center_lon, 13) # 캐시된 기본 지도 가져오기
+        m = folium.Map(location=[map_center_lat, map_center_lon], zoom_start=13)
 
         # 필터링된 식당이 없거나 유효한 위치 정보가 없으면, 경고 메시지 표시
         if filtered_df.empty or filtered_df[['위도', '경도']].isnull().all().any():
             st.warning("선택하신 조건에 맞는 식당이 없거나, 유효한 위치 정보가 없어 지도에 표시할 수 없습니다.")
-            # 빈 지도를 표시
-            folium_static(base_map, width=800, height=500)
+            # 이 경우에도 기본 지도는 표시되도록 합니다.
+            # folium_static(m, width=800, height=500) # 이미 아래에서 호출되므로 중복 제거
         else:
             # 지도의 경계를 필터링된 식당들에 맞춤
             min_lat, max_lat = filtered_df['위도'].min(), filtered_df['위도'].max()
             min_lon, max_lon = filtered_df['경도'].min(), filtered_df['경도'].max()
-            base_map.fit_bounds([[min_lat, min_lon], [max_lat, max_lon]])
+            m.fit_bounds([[min_lat, min_lon], [max_lat, max_lon]])
 
-            # 기존 마커를 제거하고 새 마커 추가 (streamlit-folium 0.6.0 이상에서 동적 마커 업데이트 가능성)
-            # 그러나 folium_static은 아직도 전체 지도를 재렌더링하는 경향이 있습니다.
-            # 이 부분을 최적화하기 위해선 folium.plugins.MarkerCluster 등을 고려해야 하지만,
-            # 현재 코드 구조에서는 지도를 캐싱하는 것이 가장 큰 성능 개선입니다.
+            # 주엽고등학교 마커 추가
+            folium.Marker(
+                location=[JUYEOP_SCHOOL_LAT, JUYEOP_SCHOOL_LON],
+                popup=folium.Popup("<strong>주엽고등학교</strong>", max_width=150),
+                tooltip="주엽고등학교",
+                icon=folium.Icon(color='red', icon='info-sign')
+            ).add_to(m)
             
-            # 모든 식당 마커를 base_map에 추가 (기존 마커를 다시 그림)
+            # 각 식당 위치에 마커 추가
             for idx, row in filtered_df.iterrows():
                 if pd.notnull(row['위도']) and pd.notnull(row['경도']):
                     popup_html = f"<h4>{row['이름']}</h4>"
@@ -229,9 +210,9 @@ else:
                         location=[row['위도'], row['경도']],
                         popup=folium.Popup(popup_html, max_width=300),
                         tooltip=row['이름']
-                    ).add_to(base_map) # base_map에 마커 추가
+                    ).add_to(m)
 
-            folium_static(base_map, width=800, height=500) # 캐시된 base_map을 표시
+        folium_static(m, width=800, height=500) # 지도를 표시
 
     st.subheader("📚 식당 목록")
     if filtered_df.empty:
