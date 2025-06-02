@@ -23,8 +23,8 @@ def haversine_distance(lat1, lon1, lat2, lon2):
     return distance # 킬로미터 단위
 
 # --- CSV 파일 로드 (웹 게시된 구글 시트 URL 붙여넣기) ---
-GOOGLE_SHEET_CSV_URL = "https://docs.google.com/sheets/d/e/2PACX-1vR6q6NZYeuslBgpRhgLnjpKOibv56VFnpsBvQDbHvfxE9KnQSUkrVIAF6bCOkrd92EO1JdGrm--H5KW/pub?output=csv"
-GOOGLE_SHEET_EDIT_URL = "https://docs.google.com/sheets/d/1YxB2y-Vvfyk3AKPR8zCYZgldDnAdk_aeaLqbl25Ye34/edit?gid=0#gid=0"
+GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR6q6NZYeuslBgpRhgLnjpKOibv56VFnpsBvQDbHvfxE9KnQSUkrVIAF6bCOkrd92EO1JdGrm--H5KW/pub?output=csv"
+GOOGLE_SHEET_EDIT_URL = "https://docs.google.com/spreadsheets/d/1YxB2y-Vvfyk3AKPR8zCYZgldDnAdk_aeaLqbl25Ye34/edit?gid=0#gid=0"
 
 @st.cache_data(ttl=86400) # 24시간마다 데이터 갱신
 def load_data(url):
