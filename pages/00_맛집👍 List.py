@@ -27,9 +27,15 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+import streamlit as st
+import pandas as pd
+import folium
+from streamlit_folium import folium_static
+import math
+
 # 주엽고등학교 위도, 경도
-JUYEOP_SCHOOL_LAT = 37.675760 # 선생님이 제공해주신 주엽고 좌표
-JUYEOP_SCHOOL_LON = 126.754785 # 선생님이 제공해주신 주엽고 좌표
+JUYEOP_SCHOOL_LAT = 37.675760
+JUYEOP_SCHOOL_LON = 126.754785
 
 # --- 거리 계산 함수 (하버사인 공식) ---
 def haversine_distance(lat1, lon1, lat2, lon2):
@@ -149,11 +155,12 @@ else:
             """, unsafe_allow_html=True)
             
             st.link_button("구글 시트 원본 바로 가기 ➡️", GOOGLE_SHEET_EDIT_URL, help="새 탭에서 구글 시트 원본을 엽니다.")
-        st.markdown("---")
 
+
+        st.markdown("---")
         
         with st.container(border=True):
-            st.header("나에게 맞는 식당 찾기 ✨") # 제목을 박스 안에 넣음
+            st.header("나에게 맞는 식당 찾기 ✨")
 
             if 'filter_option' not in st.session_state:
                 st.session_state.filter_option = 'None'
@@ -163,7 +170,7 @@ else:
             with btn_col1:
                 if st.button("주차 걱정 No! 🅿️", help="주차 난이도 '하'인 식당을 우선적으로 보여줍니다."):
                     st.session_state.filter_option = 'parking_easy'
-        
+            
             with btn_col2:
                 if st.button("학교와의 거리순 🚶‍♀️", help="학교에서 가까운 순서대로 정렬합니다."):
                     st.session_state.filter_option = 'distance_sort'
@@ -171,13 +178,25 @@ else:
             if st.button("모든 필터/정렬 해제 🔄", help="모든 필터 및 정렬을 해제하고 초기 상태로 돌아갑니다."):
                 st.session_state.filter_option = 'None'
 
-            filtered_df = df.copy()
+        # 데이터 필터링 및 정렬 로직
+        filtered_df = df.copy()
 
         if st.session_state.filter_option == 'parking_easy':
             if '주차난이도' in filtered_df.columns:
-                parking_order = {'하': 0, '중': 1, '상': 2, None: 3}
-                filtered_df['parking_sort_key'] = filtered_df['주차난이도'].fillna(None).map(parking_order)
-                filtered_df = filtered_df.sort_values(by='parking_sort_key', ascending=True).drop(columns='parking_sort_key')
+                # '주차난이도' 컬럼을 문자열로 변환하고, 첫 번째 값만 사용하도록 처리
+                # NaN 값도 처리하며, 혹시나 콤마 등으로 여러 값인 경우 첫 값만 취함
+                # map 함수가 리스트를 받지 않도록 각 값을 단일 문자열로 만듭니다.
+                filtered_df['parking_temp'] = filtered_df['주차난이도'].astype(str).apply(lambda x: x.split(',')[0].strip() if pd.notnull(x) and isinstance(x, str) else x)
+
+                parking_order = {'하': 0, '중': 1, '상': 2, 'nan': 3, 'None': 3, '':3} # 'nan', 'None', ''도 처리 (문자열로 변환된 값)
+                
+                # parking_temp의 값이 parking_order에 없으면 3으로 처리 (예상치 못한 값)
+                filtered_df['parking_sort_key'] = filtered_df['parking_temp'].map(parking_order).fillna(3) 
+                
+                # '하'인 식당을 맨 위로 올리고, 그 다음 '중', '상' 순으로 정렬
+                # 동일한 주차난이도 내에서는 이름순으로 2차 정렬 (선택 사항)
+                filtered_df = filtered_df.sort_values(by=['parking_sort_key', '이름'], ascending=[True, True]).drop(columns='parking_sort_key')
+                filtered_df = filtered_df.drop(columns='parking_temp') # 임시 컬럼 삭제
             else:
                 st.warning("CSV 파일에 '주차난이도' 컬럼이 없어 주차 필터를 적용할 수 없습니다.")
         elif st.session_state.filter_option == 'distance_sort':
